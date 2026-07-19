@@ -9,38 +9,217 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppScenesRouteImport } from './routes/_app.scenes'
+import { Route as AppRoomsRouteImport } from './routes/_app.rooms'
+import { Route as AppGenesisRouteImport } from './routes/_app.genesis'
+import { Route as AppEnergyRouteImport } from './routes/_app.energy'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCamerasRouteImport } from './routes/_app.cameras'
+import { Route as AppAutomationsRouteImport } from './routes/_app.automations'
+import { Route as AppRoomsRoomIdRouteImport } from './routes/_app.rooms.$roomId'
+import { Route as AppDevicesDeviceIdRouteImport } from './routes/_app.devices.$deviceId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppScenesRoute = AppScenesRouteImport.update({
+  id: '/scenes',
+  path: '/scenes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoomsRoute = AppRoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGenesisRoute = AppGenesisRouteImport.update({
+  id: '/genesis',
+  path: '/genesis',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEnergyRoute = AppEnergyRouteImport.update({
+  id: '/energy',
+  path: '/energy',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCamerasRoute = AppCamerasRouteImport.update({
+  id: '/cameras',
+  path: '/cameras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAutomationsRoute = AppAutomationsRouteImport.update({
+  id: '/automations',
+  path: '/automations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoomsRoomIdRoute = AppRoomsRoomIdRouteImport.update({
+  id: '/$roomId',
+  path: '/$roomId',
+  getParentRoute: () => AppRoomsRoute,
+} as any)
+const AppDevicesDeviceIdRoute = AppDevicesDeviceIdRouteImport.update({
+  id: '/devices/$deviceId',
+  path: '/devices/$deviceId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/automations': typeof AppAutomationsRoute
+  '/cameras': typeof AppCamerasRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/energy': typeof AppEnergyRoute
+  '/genesis': typeof AppGenesisRoute
+  '/rooms': typeof AppRoomsRouteWithChildren
+  '/scenes': typeof AppScenesRoute
+  '/settings': typeof AppSettingsRoute
+  '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
+  '/rooms/$roomId': typeof AppRoomsRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/automations': typeof AppAutomationsRoute
+  '/cameras': typeof AppCamerasRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/energy': typeof AppEnergyRoute
+  '/genesis': typeof AppGenesisRoute
+  '/rooms': typeof AppRoomsRouteWithChildren
+  '/scenes': typeof AppScenesRoute
+  '/settings': typeof AppSettingsRoute
+  '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
+  '/rooms/$roomId': typeof AppRoomsRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/automations': typeof AppAutomationsRoute
+  '/_app/cameras': typeof AppCamerasRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/energy': typeof AppEnergyRoute
+  '/_app/genesis': typeof AppGenesisRoute
+  '/_app/rooms': typeof AppRoomsRouteWithChildren
+  '/_app/scenes': typeof AppScenesRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/devices/$deviceId': typeof AppDevicesDeviceIdRoute
+  '/_app/rooms/$roomId': typeof AppRoomsRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/sitemap.xml'
+    | '/automations'
+    | '/cameras'
+    | '/dashboard'
+    | '/energy'
+    | '/genesis'
+    | '/rooms'
+    | '/scenes'
+    | '/settings'
+    | '/devices/$deviceId'
+    | '/rooms/$roomId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/sitemap.xml'
+    | '/automations'
+    | '/cameras'
+    | '/dashboard'
+    | '/energy'
+    | '/genesis'
+    | '/rooms'
+    | '/scenes'
+    | '/settings'
+    | '/devices/$deviceId'
+    | '/rooms/$roomId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/sitemap.xml'
+    | '/_app/automations'
+    | '/_app/cameras'
+    | '/_app/dashboard'
+    | '/_app/energy'
+    | '/_app/genesis'
+    | '/_app/rooms'
+    | '/_app/scenes'
+    | '/_app/settings'
+    | '/_app/devices/$deviceId'
+    | '/_app/rooms/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +227,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/scenes': {
+      id: '/_app/scenes'
+      path: '/scenes'
+      fullPath: '/scenes'
+      preLoaderRoute: typeof AppScenesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/rooms': {
+      id: '/_app/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof AppRoomsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/genesis': {
+      id: '/_app/genesis'
+      path: '/genesis'
+      fullPath: '/genesis'
+      preLoaderRoute: typeof AppGenesisRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/energy': {
+      id: '/_app/energy'
+      path: '/energy'
+      fullPath: '/energy'
+      preLoaderRoute: typeof AppEnergyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cameras': {
+      id: '/_app/cameras'
+      path: '/cameras'
+      fullPath: '/cameras'
+      preLoaderRoute: typeof AppCamerasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/automations': {
+      id: '/_app/automations'
+      path: '/automations'
+      fullPath: '/automations'
+      preLoaderRoute: typeof AppAutomationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/rooms/$roomId': {
+      id: '/_app/rooms/$roomId'
+      path: '/$roomId'
+      fullPath: '/rooms/$roomId'
+      preLoaderRoute: typeof AppRoomsRoomIdRouteImport
+      parentRoute: typeof AppRoomsRoute
+    }
+    '/_app/devices/$deviceId': {
+      id: '/_app/devices/$deviceId'
+      path: '/devices/$deviceId'
+      fullPath: '/devices/$deviceId'
+      preLoaderRoute: typeof AppDevicesDeviceIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRoomsRouteChildren {
+  AppRoomsRoomIdRoute: typeof AppRoomsRoomIdRoute
+}
+
+const AppRoomsRouteChildren: AppRoomsRouteChildren = {
+  AppRoomsRoomIdRoute: AppRoomsRoomIdRoute,
+}
+
+const AppRoomsRouteWithChildren = AppRoomsRoute._addFileChildren(
+  AppRoomsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAutomationsRoute: typeof AppAutomationsRoute
+  AppCamerasRoute: typeof AppCamerasRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppEnergyRoute: typeof AppEnergyRoute
+  AppGenesisRoute: typeof AppGenesisRoute
+  AppRoomsRoute: typeof AppRoomsRouteWithChildren
+  AppScenesRoute: typeof AppScenesRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppDevicesDeviceIdRoute: typeof AppDevicesDeviceIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAutomationsRoute: AppAutomationsRoute,
+  AppCamerasRoute: AppCamerasRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppEnergyRoute: AppEnergyRoute,
+  AppGenesisRoute: AppGenesisRoute,
+  AppRoomsRoute: AppRoomsRouteWithChildren,
+  AppScenesRoute: AppScenesRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppDevicesDeviceIdRoute: AppDevicesDeviceIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
