@@ -94,24 +94,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         { name: "author", content: "Tryvanta" },
         { name: "theme-color", content: "#ffffff" },
-        { property: "og:title", content: "Tryvanta Home" },
+        { property: "og:title", content: "Tryvanta Home — Smart home control" },
         {
           property: "og:description",
           content:
-            "Your home, precisely controlled. Devices, energy, cameras and GENESIS voice — in one dashboard.",
+            "Multi-tenant smart-home control for lights, cameras, energy, automations and GENESIS voice — running on the Tryvanta Device Manager.",
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: "Tryvanta Home" },
+        { name: "twitter:title", content: "Tryvanta Home — Smart home control" },
         {
           name: "twitter:description",
           content:
-            "Multi-tenant smart-home control over the Tryvanta Device Manager.",
+            "Multi-tenant smart-home control for lights, cameras, energy, automations and GENESIS voice — running on the Tryvanta Device Manager.",
         },
+        { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb212ce-be20-41d2-9f9b-12562210b2c8/id-preview-7c5416a6--c914e04d-68ea-49e7-937d-c15ce6128cc4.lovable.app-1784489110514.png" },
+        { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb212ce-be20-41d2-9f9b-12562210b2c8/id-preview-7c5416a6--c914e04d-68ea-49e7-937d-c15ce6128cc4.lovable.app-1784489110514.png" },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
         {
           rel: "preconnect",
           href: "https://fonts.googleapis.com",
