@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /rooms
+Disallow: /devices
+Disallow: /automations
+Disallow: /scenes
+Disallow: /cameras
+Disallow: /energy
+Disallow: /genesis
+Disallow: /settings
