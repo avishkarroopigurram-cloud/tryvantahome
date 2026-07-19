@@ -1,6 +1,8 @@
 // App shell: editorial sidebar on desktop, bottom nav on mobile.
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { type ReactNode } from "react";
+// DEV-ONLY: preview banner — renders nothing when VITE_PREVIEW_MODE is unset.
+import { DevPreviewBanner } from "@/components/DevPreviewBanner";
 import {
   LayoutDashboard,
   DoorOpen,
@@ -146,6 +148,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="min-w-0 flex-1 px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-10">
+        {/* DEV-ONLY: renders nothing when VITE_PREVIEW_MODE is unset */}
+        <DevPreviewBanner />
         {backendOffline && (
           <div className="mb-6 rounded-md border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
             <span className="font-medium">Backend offline.</span>{" "}

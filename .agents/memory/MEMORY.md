@@ -1,0 +1,1 @@
+- [Tryvanta dev preview setup](dev-preview-setup.md) — mock mode pattern: VITE_PREVIEW_MODE env var + fetch interceptor + localStorage token seeding, all gated to avoid production impact.
