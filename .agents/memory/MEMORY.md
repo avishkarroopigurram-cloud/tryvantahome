@@ -1,1 +1,2 @@
 - [Tryvanta dev preview setup](dev-preview-setup.md) — mock mode pattern: VITE_PREVIEW_MODE env var + fetch interceptor + localStorage token seeding, all gated to avoid production impact.
+- [Tryvanta architecture](tryvanta-architecture.md) — React PWA → FastAPI (port 8000) → ESP32; Vite proxies /api in dev; final auth is server-side allow-list in FastAPI with PyJWT.

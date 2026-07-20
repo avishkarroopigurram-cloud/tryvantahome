@@ -13,6 +13,15 @@ export default defineConfig({
       port: 5000,
       strictPort: true,
       allowedHosts: true,
+      // Proxy /api to the FastAPI backend in development.
+      // In production, FastAPI serves both the API and static frontend files
+      // on the same origin, so no proxy is needed.
+      proxy: {
+        "/api": {
+          target: "http://localhost:8000",
+          changeOrigin: true,
+        },
+      },
     },
   },
   tanstackStart: {

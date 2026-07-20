@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { ApiError, NetworkError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,14 +30,19 @@ function LoginPage() {
       await login(email, password);
       navigate({ to: "/dashboard", replace: true });
     } catch (err) {
-      const msg = (err as Error).message || "Authentication failed";
-      // Show "Access denied" prominently; other errors as a standard toast.
-      if (msg.toLowerCase().includes("access denied") || msg.toLowerCase().includes("not authorised")) {
-        toast.error("Access denied", {
-          description: "This email address is not authorised to access Tryvanta Home.",
+      if (err instanceof NetworkError) {
+        toast.error("Cannot reach the API", {
+          description: "Make sure the Tryvanta backend is running.",
         });
       } else {
-        toast.error(msg);
+        const msg = (err as ApiError).message || "Authentication failed";
+        if (msg.toLowerCase().includes("access denied") || msg.toLowerCase().includes("not authorised")) {
+          toast.error("Access denied", {
+            description: "This email address is not authorised to access Tryvanta Home.",
+          });
+        } else {
+          toast.error(msg);
+        }
       }
     } finally {
       setBusy(false);

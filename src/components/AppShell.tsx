@@ -13,6 +13,7 @@ import {
   Mic,
   Sparkles,
 } from "lucide-react";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 import { useAuth } from "@/context/AuthContext";
 import {
   Select,
@@ -146,6 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="min-w-0 flex-1 px-4 pb-24 pt-6 md:px-10 md:pb-10 md:pt-10">
+        <PwaInstallPrompt />
         {backendOffline && (
           <div className="mb-6 rounded-md border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
             <span className="font-medium">Backend offline.</span>{" "}

@@ -93,7 +93,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "Multi-tenant smart-home control for lights, cameras, energy, automations and GENESIS voice — running on the Tryvanta Device Manager.",
         },
         { name: "author", content: "Tryvanta" },
-        { name: "theme-color", content: "#ffffff" },
+        { name: "theme-color", content: "#0f172a" },
+        { name: "mobile-web-app-capable", content: "yes" },
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+        { name: "apple-mobile-web-app-title", content: "Tryvanta" },
         { property: "og:title", content: "Tryvanta Home — Smart home control" },
         {
           property: "og:description",
@@ -112,6 +116,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb212ce-be20-41d2-9f9b-12562210b2c8/id-preview-7c5416a6--c914e04d-68ea-49e7-937d-c15ce6128cc4.lovable.app-1784489110514.png" },
       ],
       links: [
+        { rel: "manifest", href: "/manifest.webmanifest" },
+        { rel: "apple-touch-icon", href: "/icons/icon-192.png" },
         { rel: "stylesheet", href: appCss },
         {
           rel: "preconnect",
@@ -159,6 +165,17 @@ function SessionExpiredBridge() {
   return null;
 }
 
+function ServiceWorkerRegistration() {
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js", { scope: "/" })
+        .catch((err) => console.warn("[SW] Registration failed:", err));
+    }
+  }, []);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -166,6 +183,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SessionExpiredBridge />
+        <ServiceWorkerRegistration />
         <Toaster
           position="top-right"
           richColors
