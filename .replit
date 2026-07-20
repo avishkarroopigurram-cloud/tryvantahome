@@ -9,6 +9,8 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
+PW_HASH_AAVISHKAR = "$2b$12$t/U/WnwYdMv8jBbA3ZIjyeIwpDoHXGfTOT8g0t7pCYTH6IX8QZx2W"
+PW_HASH_RAJANI = "$2b$12$658/fLZLJm2toaBTlV5TQOGnU.b3KwZ6PbONmqmDcQOz6cav2CwUa"
 
 [workflows]
 runButton = "Project"
@@ -57,3 +59,8 @@ externalPort = 80
 [[ports]]
 localPort = 8000
 externalPort = 8000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+build = ["bun", "run", "build"]

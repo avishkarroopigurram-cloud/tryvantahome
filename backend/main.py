@@ -1,21 +1,29 @@
 """
 Tryvanta Home — FastAPI backend
-JWT auth (email allow-list) + relay device management + ESP32 proxy.
+JWT auth (email allow-list + bcrypt password validation) + relay device management + ESP32 proxy.
+In production, also serves the built React frontend (dist/).
 
-Run with:
+Run (dev):
     uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+Run (prod, from workspace root):
+    uvicorn backend.main:app --host 0.0.0.0 --port 8000
 """
 from __future__ import annotations
 
 import os
 import time
+from pathlib import Path
 from typing import Any
 
+import bcrypt as _bcrypt
 import httpx
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 # ── Configuration ─────────────────────────────────────────────────────────────
@@ -29,14 +37,32 @@ REFRESH_TTL = 60 * 24 * 3600   # 60 days
 ESP32_BASE    = "http://192.168.29.220"
 ESP32_TIMEOUT = 5.0  # seconds
 
-ALLOWED_EMAILS: set[str] = {
-    "rajanikanthmattepally@gmail.com",
-    "aavishkarroopi@gmail.com",
+# ── Password helpers ──────────────────────────────────────────────────────────
+def _verify_password(plain: str, hashed: str) -> bool:
+    """Constant-time bcrypt verification."""
+    try:
+        return _bcrypt.checkpw(plain.encode(), hashed.encode())
+    except Exception:
+        return False
+
+# ── User credentials ───────────────────────────────────────────────────────────
+# Passwords are stored as bcrypt hashes in environment variables.
+# Set PW_HASH_RAJANI and PW_HASH_AAVISHKAR before starting.
+# Only these two emails are authorised.
+_CREDENTIALS: dict[str, str | None] = {
+    "rajanikanthmattepally@gmail.com": os.environ.get("PW_HASH_RAJANI"),
+    "aavishkarroopi@gmail.com":        os.environ.get("PW_HASH_AAVISHKAR"),
 }
 
+ALLOWED_EMAILS: set[str] = set(_CREDENTIALS.keys())
+
+# Warn on startup if hashes are missing (server will still start, but login will fail)
+for _email, _hash in _CREDENTIALS.items():
+    if not _hash:
+        print(f"[WARNING] No password hash configured for {_email} "
+              f"(set the matching PW_HASH_* environment secret)")
+
 # ── In-memory relay state ─────────────────────────────────────────────────────
-# Reflects the last known power state. Reset to False on server restart.
-# Future: persist to SQLite or read back from ESP32 on startup.
 _relay_state: dict[int, bool] = {1: False, 2: False, 3: False, 4: False}
 
 # ── App ───────────────────────────────────────────────────────────────────────
@@ -105,11 +131,17 @@ class TokenPair(BaseModel):
 @app.post("/api/v1/auth/login", response_model=TokenPair)
 async def login(req: LoginRequest) -> TokenPair:
     email = req.email.strip().lower()
-    if email not in ALLOWED_EMAILS:
+
+    stored_hash = _CREDENTIALS.get(email)
+
+    # Reject unknown emails and wrong passwords with the same generic error
+    # to avoid leaking which emails are registered.
+    if stored_hash is None or not _verify_password(req.password, stored_hash):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
-            detail="Access denied. This email is not authorised.",
+            detail="Incorrect email or password.",
         )
+
     return TokenPair(
         access_token=_make_token(email, ACCESS_TTL),
         refresh_token=_make_token(email, REFRESH_TTL),
@@ -274,3 +306,25 @@ async def device_command(
 
     _relay_state[relay_num] = new_power
     return {"state": {"power": new_power}}
+
+
+# ── Frontend static file serving (production only) ────────────────────────────
+# In development, Vite runs on its own port and proxies /api to this server.
+# In production, the build step compiles the frontend into dist/ and this
+# server serves it directly — one port for everything.
+
+_DIST = Path(__file__).parent.parent / "dist"
+
+if _DIST.exists():
+    # Serve Vite's hashed asset bundle
+    app.mount("/assets", StaticFiles(directory=str(_DIST / "assets")), name="assets")
+
+    # Serve any other static file that exists in dist/ (icons, manifest, sw.js …)
+    @app.get("/{full_path:path}")
+    async def serve_spa(request: Request, full_path: str) -> FileResponse:
+        # Let explicit files through (favicon, manifest, icons, sw.js …)
+        candidate = _DIST / full_path
+        if candidate.is_file():
+            return FileResponse(str(candidate))
+        # Everything else → index.html so the React router can handle it
+        return FileResponse(str(_DIST / "index.html"))
