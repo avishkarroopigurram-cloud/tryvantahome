@@ -9,7 +9,6 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
-VITE_PREVIEW_MODE = "true"
 
 [workflows]
 runButton = "Project"

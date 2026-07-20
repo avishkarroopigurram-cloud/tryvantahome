@@ -1,14 +1,13 @@
 # Tryvanta Home Platform
 
-A multi-tenant smart-home dashboard frontend — lights, fans, cameras, energy, automations, and GENESIS voice assistant.
+A smart-home dashboard frontend for controlling ESP32 relay hardware over a local network.
 
 ## Stack
 
 - **React 19** with **TanStack Router / TanStack Start** (file-based routing, SSR-capable)
 - **Tailwind CSS v4** + **shadcn/ui** (Radix primitives)
-- **Recharts** for energy graphs
 - **Bun** as package manager / runtime
-- **Vite 8** (`@lovable.dev/vite-tanstack-config`) as dev server & bundler
+- **Vite 8** (`@lovable.dev/vite-tanstack-config`)
 
 ## Running the app
 
@@ -16,64 +15,81 @@ A multi-tenant smart-home dashboard frontend — lights, fans, cameras, energy, 
 bun run dev   # starts on http://localhost:5000
 ```
 
-The workflow **Start application** (`bun run dev`) is pre-configured. The preview pane opens automatically.
+The workflow **Start application** (`bun run dev`) is pre-configured.
 
-## Dev Preview Mode
+## Authentication
 
-The app runs fully without a FastAPI backend. `VITE_PREVIEW_MODE=true` is set as a shared env var, which activates an in-process mock layer:
+Login is controlled by a client-side email allow-list — no backend required.
 
-- Fake auth tokens are seeded into `localStorage` so the auth gate passes.
-- `window.fetch` is patched to intercept every `/api/v1/` call and return realistic mock data (devices, rooms, scenes, automations, energy, GENESIS responses).
-- An amber **Dev Preview Mode** banner is shown inside the app shell.
-- **Production auth is completely untouched** — the mock only runs when `VITE_PREVIEW_MODE` is truthy.
+**Authorised emails:**
+- `rajanikanthmattepally@gmail.com`
+- `aavishkarroopi@gmail.com`
 
-Mock data files live in `src/lib/dev-preview/`:
-| File | Purpose |
-|------|---------|
-| `mock-data.ts` | All fixture data (user, home, rooms, devices, scenes, automations, cameras, energy) |
-| `interceptor.ts` | Fetch interceptor router — handles every `/api/v1/*` endpoint |
-| `index.ts` | Module-level side-effect entry; imported from `src/router.tsx` |
+Any other email receives "Access denied." Auth state is persisted in `localStorage` and survives page reloads.
 
-`src/components/DevPreviewBanner.tsx` renders the dismissible amber banner (guarded by `import.meta.env.VITE_PREVIEW_MODE`).
+To add or remove users, edit the `ALLOWED_EMAILS` set in `src/context/AuthContext.tsx`.
 
-To disable preview mode and point at a real backend, remove `VITE_PREVIEW_MODE` from the shared env vars and set `VITE_API_BASE` to your FastAPI server URL.
+## ESP32 Relay Control
 
-## Backend
+The dashboard talks directly to an ESP32 relay board at `http://192.168.29.220`.
 
-The FastAPI backend is **not included** in this repo. The frontend expects it at `VITE_API_BASE` (defaults to same-origin). Authentication uses JWT access + refresh tokens stored in `localStorage` under keys `tv_access`, `tv_refresh`, and `tv_home`.
+| Relay | On endpoint          | Off endpoint          |
+|-------|----------------------|-----------------------|
+| 1     | `/relay1/on`         | `/relay1/off`         |
+| 2     | `/relay2/on`         | `/relay2/off`         |
+| 3     | `/relay3/on`         | `/relay3/off`         |
+| 4     | `/relay4/on`         | `/relay4/off`         |
+
+**CORS requirement:** The ESP32 firmware must return `Access-Control-Allow-Origin: *` on every HTTP response, otherwise the browser will block the requests.
+
+**Mixed-content requirement:** Access the dashboard over HTTP (not HTTPS) from your local network, e.g. `http://<host-ip>:5000/`. Browsers block HTTP fetch calls from HTTPS pages. The Replit preview proxy uses HTTPS, so relay commands will be blocked there — use the local URL when operating relays.
+
+ESP32 base URL and relay functions live in `src/lib/esp32.ts`.
 
 ## Project structure
 
 ```
 src/
-  components/       UI components (AppShell, DeviceCard, DeviceIcon, shadcn/ui)
-  context/          AuthContext — JWT auth, home switching, session state
-  hooks/            use-mobile
+  components/
+    RelayCard.tsx       Relay toggle card — calls ESP32 directly
+    AppShell.tsx        Nav shell (sidebar + mobile bottom nav)
+    DeviceCard.tsx      Generic device card (for future devices)
+    DeviceIcon.tsx      Icon resolver
+    ui/                 shadcn/ui primitives
+  context/
+    AuthContext.tsx     Allow-list auth — no backend required
   lib/
-    api.ts          Fetch wrapper with token refresh + error mapping
-    types.ts        TypeScript interfaces matching FastAPI schemas
-    realtime.ts     WebSocket hook (auto-reconnect)
-    dev-preview/    DEV-ONLY mock layer (see above)
-  routes/           File-based routes (TanStack Router)
-    index.tsx       Landing / redirect gate
-    login.tsx       Sign-in form
-    _app.tsx        Auth-gated layout
-    _app.dashboard.tsx
-    _app.rooms.tsx / _app.rooms.$roomId.tsx
-    _app.devices.$deviceId.tsx
-    _app.energy.tsx
-    _app.scenes.tsx
-    _app.automations.tsx
-    _app.cameras.tsx
-    _app.genesis.tsx
-    _app.settings.tsx
-  router.tsx        Router factory (also installs dev preview)
-  start.ts          TanStack Start server entry
-  server.ts         SSR error wrapper
+    esp32.ts            Direct HTTP client for the ESP32 relay board
+    api.ts              FastAPI HTTP client (for future backend)
+    types.ts            TypeScript interfaces
+    realtime.ts         WebSocket hook (for future backend)
+    dev-preview/        Legacy mock layer (inactive — no longer imported)
+  routes/
+    index.tsx           Landing / redirect gate
+    login.tsx           Sign-in form with allow-list check
+    _app.tsx            Auth-gated layout
+    _app.dashboard.tsx  Relay dashboard — 4 relays, direct ESP32 calls
+    _app.rooms.tsx      (future)
+    _app.energy.tsx     (future)
+    _app.automations.tsx (future)
+    _app.scenes.tsx     (future)
+    _app.cameras.tsx    (future)
+    _app.genesis.tsx    (future)
+    _app.settings.tsx   (future)
+  router.tsx            Router factory
+  server.ts             SSR error wrapper
 ```
+
+## Roadmap (not yet implemented)
+
+1. **FastAPI backend** — real device persistence, user accounts, cloud sync
+2. **More ESP32 devices** — dimmers, sensors, curtains, locks
+3. **Automations** — time-based and sensor-triggered relay rules
+4. **Energy monitoring** — current sensing per relay
+5. **GENESIS voice** — natural-language relay control
 
 ## User preferences
 
 - Keep production auth paths untouched when adding dev-only features.
-- Gate all dev-only code on `import.meta.env.VITE_PREVIEW_MODE` (not `import.meta.env.DEV`) so it can be toggled without rebuilding.
 - Use Bun (`bun install`, `bun run dev`) — do not use npm or yarn.
+- The ESP32 base URL lives in `src/lib/esp32.ts` as `ESP32_BASE`.
